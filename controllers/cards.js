@@ -41,12 +41,15 @@ deleteLikes = (req, res) => {
   card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true },
-  ) 
+    { new: true }
+  );
 };
 
 module.exports = {
   getCards,
   createCard,
   createCard,
+  deleteCard,
+  putLikes,
+  deleteLikes,
 };

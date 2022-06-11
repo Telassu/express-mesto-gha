@@ -6,7 +6,7 @@ const {
   createCard,
   deleteCard,
   putLikes,
-  deleteLikes,
+  deleteLikes
 } = require("../controllers/cards");
 
 //возвращает все карточки
