@@ -1,19 +1,21 @@
 const user = require("../models/user");
 
+const BAD_REQUEST = 400;
+const NOT_FOUND = 404;
+const SOME_ERROR = 500;
+
 //возвращает всех пользователей
 getUsers = (req, res) => {
   user
     .find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => {
-      if (res.status === 400) {
-        res.send({
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res.status(BAD_REQUEST).send({
           message: "Переданы некорректные данные при создании пользователя",
         });
-        return;
-      } else if (res.status === 500) {
-        res.send({ message: "Ошибка по умолчанию" });
-        return;
+      } else {
+        return res.status(SOME_ERROR).send({ message: "Ошибка по умолчанию" });
       }
     });
 };
@@ -23,13 +25,13 @@ getUserId = (req, res) => {
   user
     .findById(req.params.userId)
     .then((user) => res.send({ data: user }))
-    .catch(() => {
-      if (res.status === 404) {
-        res.send({ message: "Пользователь с указанным _id не найден" });
-        return;
-      } else if (res.status === 500) {
-        res.send({ message: "Ошибка по умолчанию" });
-        return;
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Пользователь с указанным _id не найден" });
+      } else {
+        return res.status(SOME_ERROR).send({ message: "Ошибка по умолчанию" });
       }
     });
 };
@@ -41,15 +43,13 @@ createUser = (req, res) => {
   user
     .create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
-    .catch(() => {
-      if (res.status === 400) {
-        res.send({
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res.status(BAD_REQUEST).send({
           message: "Переданы некорректные данные при создании пользователя",
         });
-        return;
-      } else if (res.status === 500) {
-        res.send({ message: "Ошибка по умолчанию" });
-        return;
+      } else {
+        return res.status(SOME_ERROR).send({ message: "Ошибка по умолчанию" });
       }
     });
 };
@@ -69,18 +69,18 @@ updateUserProfile = (req, res) => {
       }
     )
     .then((user) => res.send({ data: user }))
-    .catch(() => {
-      if (res.status === 400) {
-        res.send({
-          message: "Переданы некорректные данные при обновлении профиля",
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res.status(BAD_REQUEST).send({
+          message: "Переданы некорректные данные при создании пользователя",
         });
-        return;
-      } else if (res.status === 404) {
-        res.send({ message: "Пользователь с указанным _id не найден" });
-        return;
-      } else if (res.status === 500) {
-        res.send({ message: "Ошибка по умолчанию" });
-        return;
+      }
+      if (err.name === "CastError") {
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Пользователь с указанным _id не найден" });
+      } else {
+        return res.status(SOME_ERROR).send({ message: "Ошибка по умолчанию" });
       }
     });
 };
@@ -100,18 +100,18 @@ updateUserAvatar = (req, res) => {
       }
     )
     .then((user) => res.send({ data: user }))
-    .catch(() => {
-      if (res.status === 400) {
-        res.send({
-          message: "Переданы некорректные данные при обновлении аватара",
+    .catch((err) => {
+      if (err.name === "ValidationError") {
+        return res.status(BAD_REQUEST).send({
+          message: "Переданы некорректные данные при создании пользователя",
         });
-        return;
-      } else if (res.status === 404) {
-        res.send({ message: "Пользователь с указанным _id не найден" });
-        return;
-      } else if (res.status === 500) {
-        res.send({ message: "Ошибка по умолчанию" });
-        return;
+      }
+      if (err.name === "CastError") {
+        return res
+          .status(NOT_FOUND)
+          .send({ message: "Пользователь с указанным _id не найден" });
+      } else {
+        return res.status(SOME_ERROR).send({ message: "Ошибка по умолчанию" });
       }
     });
 };
