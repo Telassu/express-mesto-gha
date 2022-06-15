@@ -6,6 +6,12 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
+const logger = (req, res, next) => {
+  res.send({ message: "Страница не найдена" });
+
+  next();
+};
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -23,6 +29,7 @@ app.use((req, res, next) => {
 
 app.use("/", require("./routes/users"));
 app.use("/", require("./routes/cards"));
+app.use(logger);
 
 app.listen(PORT, () => {
   console.log(`I'm listening port: ${PORT}`);
