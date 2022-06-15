@@ -24,12 +24,22 @@ getUsers = (req, res) => {
 getUserId = (req, res) => {
   user
     .findById(req.params.userId)
-    .then((user) => res.send({ data: user }))
+    .then((user) => {
+      if (!user) {
+        res
+          .status(NOT_FOUND)
+          .send({ message: "Пользователь с указанным _id не найден" });
+      } else {
+        res.send({ data: user });
+      }
+    })
     .catch((err) => {
       if (err.name === "CastError") {
         return res
-          .status(NOT_FOUND)
-          .send({ message: "Пользователь с указанным _id не найден" });
+          .status(BAD_REQUEST)
+          .send({
+            message: "Переданы некорректные данные при создании пользователя",
+          });
       } else {
         return res.status(SOME_ERROR).send({ message: "Ошибка по умолчанию" });
       }
