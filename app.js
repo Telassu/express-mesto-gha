@@ -7,7 +7,7 @@ const { PORT = 3000 } = process.env;
 const app = express();
 
 const logger = (req, res, next) => {
-  res.send({ message: "Страница не найдена" });
+  res.status(404).send({ message: "Страница не найдена" });
 
   next();
 };
