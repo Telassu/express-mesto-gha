@@ -35,11 +35,9 @@ getUserId = (req, res) => {
     })
     .catch((err) => {
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({
-            message: "Переданы некорректные данные при создании пользователя",
-          });
+        return res.status(BAD_REQUEST).send({
+          message: "Переданы некорректные данные при создании пользователя",
+        });
       } else {
         return res.status(SOME_ERROR).send({ message: "Ошибка по умолчанию" });
       }
