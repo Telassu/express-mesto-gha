@@ -1,72 +1,66 @@
-const user = require("../models/user");
+const User = require('../models/user');
 
 const BAD_REQUEST = 400;
 const NOT_FOUND = 404;
 const SOME_ERROR = 500;
 
-//возвращает всех пользователей
-getUsers = (req, res) => {
-  user
+// возвращает всех пользователей
+const getUsers = (req, res) => {
+  User
     .find({})
     .then((users) => res.send({ data: users }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return res.status(BAD_REQUEST).send({
-          message: "Переданы некорректные данные при создании пользователя",
+          message: 'Переданы некорректные данные при создании пользователя',
         });
-      } else {
-        return res.status(SOME_ERROR).send({ message: "Ошибка по умолчанию" });
-      }
+      } return res.status(SOME_ERROR).send({ message: 'Ошибка по умолчанию' });
     });
 };
 
-//возвращает пользователя по _id
-getUserId = (req, res) => {
-  user
+// возвращает пользователя по _id
+const getUserId = (req, res) => {
+  User
     .findById(req.params.userId)
     .then((user) => {
       if (!user) {
         res
           .status(NOT_FOUND)
-          .send({ message: "Пользователь с указанным _id не найден" });
+          .send({ message: 'Пользователь с указанным _id не найден' });
       } else {
         res.send({ data: user });
       }
     })
     .catch((err) => {
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         return res.status(BAD_REQUEST).send({
-          message: "Переданы некорректные данные при создании пользователя",
+          message: 'Переданы некорректные данные при создании пользователя',
         });
-      } else {
-        return res.status(SOME_ERROR).send({ message: "Ошибка по умолчанию" });
-      }
+      } return res.status(SOME_ERROR).send({ message: 'Ошибка по умолчанию' });
     });
 };
 
-//создает пользователя
-createUser = (req, res) => {
+// создает пользователя
+const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
-  user
+  User
     .create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return res.status(BAD_REQUEST).send({
-          message: "Переданы некорректные данные при создании пользователя",
+          message: 'Переданы некорректные данные при создании пользователя',
         });
-      } else {
-        return res.status(SOME_ERROR).send({ message: "Ошибка по умолчанию" });
-      }
+      } return res.status(SOME_ERROR).send({ message: 'Ошибка по умолчанию' });
     });
 };
 
-//обновляет профиль
-updateUserProfile = (req, res) => {
+// обновляет профиль
+const updateUserProfile = (req, res) => {
   const { name, about } = req.body;
 
-  user
+  User
     .findByIdAndUpdate(
       req.user._id,
       { name, about },
@@ -74,30 +68,28 @@ updateUserProfile = (req, res) => {
         new: true,
         runValidators: true,
         upsert: true,
-      }
+      },
     )
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return res.status(BAD_REQUEST).send({
-          message: "Переданы некорректные данные при создании пользователя",
+          message: 'Переданы некорректные данные при создании пользователя',
         });
       }
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         return res
           .status(NOT_FOUND)
-          .send({ message: "Пользователь с указанным _id не найден" });
-      } else {
-        return res.status(SOME_ERROR).send({ message: "Ошибка по умолчанию" });
-      }
+          .send({ message: 'Пользователь с указанным _id не найден' });
+      } return res.status(SOME_ERROR).send({ message: 'Ошибка по умолчанию' });
     });
 };
 
-//обновляет аватар
-updateUserAvatar = (req, res) => {
+// обновляет аватар
+const updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
 
-  user
+  User
     .findByIdAndUpdate(
       req.user._id,
       { avatar },
@@ -105,22 +97,20 @@ updateUserAvatar = (req, res) => {
         new: true,
         runValidators: true,
         upsert: true,
-      }
+      },
     )
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return res.status(BAD_REQUEST).send({
-          message: "Переданы некорректные данные при создании пользователя",
+          message: 'Переданы некорректные данные при создании пользователя',
         });
       }
-      if (err.name === "CastError") {
+      if (err.name === 'CastError') {
         return res
           .status(NOT_FOUND)
-          .send({ message: "Пользователь с указанным _id не найден" });
-      } else {
-        return res.status(SOME_ERROR).send({ message: "Ошибка по умолчанию" });
-      }
+          .send({ message: 'Пользователь с указанным _id не найден' });
+      } return res.status(SOME_ERROR).send({ message: 'Ошибка по умолчанию' });
     });
 };
 
