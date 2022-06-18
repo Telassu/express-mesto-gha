@@ -4,7 +4,7 @@
   "description": "express mesto pr",
   "main": "app.js",
   "scripts": {
-    "lint": "eslint app.js",
+    "lint": "npx eslint .",
     "start": "node app.js",
     "dev": "nodemon app.js"
   },

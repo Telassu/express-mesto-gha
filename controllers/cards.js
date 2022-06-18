@@ -1,21 +1,12 @@
 const Card = require('../models/card');
-
-const BAD_REQUEST = 400;
-const NOT_FOUND = 404;
-const SOME_ERROR = 500;
+const { BAD_REQUEST, NOT_FOUND, SOME_ERROR } = require('../utils/errors');
 
 // возвращает все карточки
 const getCards = (req, res) => {
   Card
     .find({})
     .then((cards) => res.send({ data: cards }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(BAD_REQUEST).send({
-          message: 'Переданы некорректные данные при создании карточки',
-        });
-      } return res.status(SOME_ERROR).send({ message: 'Ошибка по умолчанию' });
-    });
+    .catch(() => res.status(SOME_ERROR).send({ message: 'Ошибка по умолчанию' }));
 };
 
 // создает карточку
