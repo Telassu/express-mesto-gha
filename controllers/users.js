@@ -39,6 +39,28 @@ const getUserId = (req, res) => {
     });
 };
 
+// возвращает информацию о текущем пользователе
+const getUserMe = (req, res) => {
+  User
+    .findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        res
+          .status(NOT_FOUND)
+          .send({ message: 'Пользователь с указанным _id не найден' });
+      }
+      res.send({ data: user });
+    })
+    // eslint-disable-next-line consistent-return
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(BAD_REQUEST).send({
+          message: 'Передан некорректный _id пользователя',
+        });
+      }
+    });
+};
+
 // создает пользователя
 const createUser = (req, res) => {
   const {
@@ -148,7 +170,7 @@ const login = (req, res) => {
         maxAge: 360000 * 24 * 7,
         httpOnly: true,
       });
-      res.send({ message: 'Всё прошло успешно!' });
+      res.send({ token });
     })
     .catch((err) => {
       res.status(UNAUTHORIZED).send({ message: err.message });
@@ -158,6 +180,7 @@ const login = (req, res) => {
 module.exports = {
   getUsers,
   getUserId,
+  getUserMe,
   createUser,
   updateUserProfile,
   updateUserAvatar,

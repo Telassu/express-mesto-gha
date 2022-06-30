@@ -31,13 +31,14 @@ const deleteCard = (req, res) => {
   Card
     .findByIdAndRemove(req.params.cardId)
     .then((card) => {
+      if (card.owner.toString() !== req.user._id) {
+        res.status(BAD_REQUEST).send({ message: 'Недостаточно прав' });
+      }
       if (!card) {
         res
           .status(NOT_FOUND)
           .send({ message: 'Карточка с указанным _id не найдена' });
-      } else {
-        res.send({ data: card });
-      }
+      } res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
