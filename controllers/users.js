@@ -13,7 +13,7 @@ const getUsers = (req, res, next) => {
   User
     .find({})
     .then((users) => res.send({ data: users }))
-    .catch((next));
+    .catch(next);
 };
 
 // возвращает пользователя по _id
@@ -26,7 +26,13 @@ const getUserId = (req, res, next) => {
       }
       res.send({ data: user });
     })
-    .catch((next));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Переданы некорректные данные'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // возвращает информацию о текущем пользователе
@@ -39,7 +45,7 @@ const getUserMe = (req, res, next) => {
       }
       res.send({ data: user });
     })
-    .catch((next));
+    .catch(next);
 };
 
 // создает пользователя
@@ -51,25 +57,27 @@ const createUser = (req, res, next) => {
     email,
     password,
   } = req.body;
-
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash,
-    }))
-    .then(() => res.send({ name, about, avatar }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequest('Переданы некорректные данные при создании пользователя'));
-      }
-      if (err.code === 11000) {
-        next(new Conflict('Email уже зарегистрирован'));
-      }
-      next(err);
-    });
+  const user = User.findOne({ email });
+  if (user) {
+    throw new Conflict(`Пользователь ${email} уже существует`);
+  } else {
+    bcrypt.hash(password, 10)
+      .then((hash) => User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      }))
+      .then(() => res.send({ name, about, avatar }))
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          next(new BadRequest('Переданы некорректные данные при создании пользователя'));
+        } else {
+          next(err);
+        }
+      });
+  }
 };
 
 // обновляет профиль
@@ -83,7 +91,7 @@ const updateUserProfile = (req, res, next) => {
       {
         new: true,
         runValidators: true,
-        upsert: true,
+        upsert: false,
       },
     )
     .then((user) => {
@@ -95,8 +103,9 @@ const updateUserProfile = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequest('Переданы некорректные данные при редактировании пользователя'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -111,7 +120,7 @@ const updateUserAvatar = (req, res, next) => {
       {
         new: true,
         runValidators: true,
-        upsert: true,
+        upsert: false,
       },
     )
     .then((user) => {
@@ -123,8 +132,9 @@ const updateUserAvatar = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequest('Переданы некорректные данные при редактировании аватара пользователя'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -143,8 +153,7 @@ const login = (req, res, next) => {
     })
     .catch(() => {
       next(new Unauthorized('Неправильный email или пароль'));
-    })
-    .catch(next);
+    });
 };
 
 module.exports = {

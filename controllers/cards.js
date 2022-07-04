@@ -8,7 +8,7 @@ const getCards = (req, res, next) => {
   Card
     .find({})
     .then((cards) => res.send({ data: cards }))
-    .catch((next));
+    .catch(next);
 };
 
 // создает карточку
@@ -22,8 +22,9 @@ const createCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequest('Переданы некорректные данные при создании карточки'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -39,10 +40,16 @@ const deleteCard = (req, res, next) => {
         throw new Forbidden('Недостаточно прав для удаления карточки');
       }
       Card.findByIdAndRemove(req.params.cardId)
-        .then(() => res.send({ data: card }))
+        .then(() => res.send({ message: 'Карточка успешно удалена' }))
         .catch(next);
     })
-    .catch((next));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Переданы некорректные данные'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // поставить лайк карточке
@@ -59,7 +66,13 @@ const putLikes = (req, res, next) => {
       }
       res.send({ data: card });
     })
-    .catch((next));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Переданы некорректные данные'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 // убрать лайк с карточки
@@ -76,7 +89,13 @@ const deleteLikes = (req, res, next) => {
       }
       res.send({ data: card });
     })
-    .catch((next));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Переданы некорректные данные'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports = {
