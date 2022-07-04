@@ -57,27 +57,31 @@ const createUser = (req, res, next) => {
     email,
     password,
   } = req.body;
-  const user = User.findOne({ email });
-  if (user) {
-    throw new Conflict(`Пользователь ${email} уже существует`);
-  } else {
-    bcrypt.hash(password, 10)
-      .then((hash) => User.create({
-        name,
-        about,
-        avatar,
-        email,
-        password: hash,
-      }))
-      .then(() => res.send({ name, about, avatar }))
-      .catch((err) => {
-        if (err.name === 'ValidationError') {
-          next(new BadRequest('Переданы некорректные данные при создании пользователя'));
-        } else {
-          next(err);
-        }
-      });
-  }
+
+  User
+    .findOne({ email })
+    .then((user) => {
+      if (user) {
+        next(new Conflict(`Пользователь ${email} уже существует`));
+      } else {
+        bcrypt.hash(password, 10)
+          .then((hash) => User.create({
+            name,
+            about,
+            avatar,
+            email,
+            password: hash,
+          }))
+          .then(() => res.send({ name, about, avatar }))
+          .catch((err) => {
+            if (err.name === 'ValidationError') {
+              next(new BadRequest('Переданы некорректные данные при создании пользователя'));
+            } else {
+              next(err);
+            }
+          });
+      }
+    });
 };
 
 // обновляет профиль
