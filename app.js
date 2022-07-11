@@ -6,6 +6,7 @@ const { celebrate, Joi, errors } = require('celebrate');
 
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFound = require('./errors/NotFound');
 
 const regex = /(https?:\/\/)([www.]?[a-zA-Z0-9-]+\.)([^\s]{2,})/;
@@ -20,6 +21,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
 });
+
+app.use(requestLogger);
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
@@ -47,6 +50,7 @@ app.use((req, res, next) => {
   next(new NotFound('Страница не найдена'));
 });
 
+app.use(errorLogger);
 app.use(errors());
 
 app.use((err, req, res, next) => {
